@@ -39,6 +39,13 @@ namespace EngineTest
             //Remember to delete our buffer.
             _gl.DeleteBuffer(_handle);
         }
+
+        public void Clear()
+        {
+            _gl.BindVertexArray(0);
+            _gl.BindBuffer(BufferTargetARB.ArrayBuffer, 0);
+            _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, 0);
+        }
     }
     
 }
