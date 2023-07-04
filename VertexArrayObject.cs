@@ -1,8 +1,7 @@
-﻿using EngineTest;
 using Silk.NET.OpenGL;
 using System;
 
-namespace VAO
+namespace Tutorial
 {
     //The vertex array object abstraction.
     public class VertexArrayObject<TVertexType, TIndexType> : IDisposable
@@ -29,7 +28,7 @@ namespace VAO
         public unsafe void VertexAttributePointer(uint index, int count, VertexAttribPointerType type, uint vertexSize, int offSet)
         {
             //Setting up a vertex attribute pointer
-            _gl.VertexAttribPointer(index, count, type, false, vertexSize * (uint)sizeof(TVertexType), (void*)(offSet * sizeof(TVertexType)));
+            _gl.VertexAttribPointer(index, count, type, false, vertexSize * (uint) sizeof(TVertexType), (void*) (offSet * sizeof(TVertexType)));
             _gl.EnableVertexAttribArray(index);
         }
 

@@ -1,7 +1,7 @@
-﻿using Silk.NET.OpenGL;
+using Silk.NET.OpenGL;
 using System;
 
-namespace EngineTest
+namespace Tutorial
 {
     //Our buffer object abstraction.
     public class BufferObject<TDataType> : IDisposable
@@ -24,7 +24,7 @@ namespace EngineTest
             Bind();
             fixed (void* d = data)
             {
-                _gl.BufferData(bufferType, (nuint)(data.Length * sizeof(TDataType)), d, BufferUsageARB.StaticDraw);
+                _gl.BufferData(bufferType, (nuint) (data.Length * sizeof(TDataType)), d, BufferUsageARB.StaticDraw);
             }
         }
 
@@ -39,13 +39,5 @@ namespace EngineTest
             //Remember to delete our buffer.
             _gl.DeleteBuffer(_handle);
         }
-
-        public void Clear()
-        {
-            _gl.BindVertexArray(0);
-            _gl.BindBuffer(BufferTargetARB.ArrayBuffer, 0);
-            _gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, 0);
-        }
     }
-    
 }

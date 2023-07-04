@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.IO;
 using Silk.NET.OpenGL;
 
-namespace EngineTest
+namespace Tutorial
 {
     public class Shader : IDisposable
     {
@@ -91,6 +91,5 @@ namespace EngineTest
 
             return handle;
         }
-
     }
 }
