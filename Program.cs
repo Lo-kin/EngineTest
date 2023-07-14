@@ -1,194 +1,202 @@
-using Silk.NET.Input;
+ï»¿using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
-using System;
 using Silk.NET.Maths;
 using VAO;
-using Controls;
-using System.Timers;
-namespace EngineTest
-using System.Timers;
-
-namespace EngineTest
-
+using System.Collections;
+using System.Numerics;
+using System.Drawing;
 
 namespace EngineTest
 {
-    class Program
+    class Graphic
     {
         private static IWindow window;
         private static GL Gl;
-        
 
-        private static float[] Vertices =
-        
+        //Our new abstracted objects, here we specify what the types are.
+        private static BufferObject<float> Vbo;
+        private static BufferObject<uint> Ebo;
+        private static VertexArrayObject<float, uint> Vao;
+        private static Shader Shader;
 
-        public static float[] Vertices =
-        
-
-        public static float[] Vertices =
+        public static float[] VertexArray =
         {
+            
             //X    Y      Z     R  G  B  A
-             0.5f,  0.5f, 0.0f, 1, 1, 1, 0,
-             0.5f, -0.5f, 0.0f, 1, 1, 1, 0,
-            -0.5f, -0.5f, 0.0f, 1, 1, 1, 0,
-            -0.5f,  0.5f, 0.5f, 1, 1, 1, 0
+             0.5f,  0.5f, 0.0f, 1, 0, 1, 0.5f,
+             0.5f, -0.5f, 0.0f, 0, 1, 0, 0.5f,
+            -0.5f, -0.5f, 0.0f, 1, 0, 1, 0.5f,
+            -0.5f,  0.5f, 0.0f, 0, 1, 0, 0.5f,
+            
+             0.1f,  0.1f, 0.0f, 1, 1, 1, 0.5f,
+             0.1f, -0.1f, 0.0f, 1, 1, 1, 0.5f,
+            -0.1f, -0.1f, 0.0f, 1, 1, 1, 0.5f,
+            -0.1f,  0.1f, 0.0f, 1, 1, 1, 0.5f,
         };
 
         private static readonly uint[] Indices =
         {
             0, 1, 3,
+            1, 2, 3,
+            4, 5, 7,
+            5 , 6,7,
+        };
+
+        public static int[] RenderObjects =
+        {
+            0,
+        };
+
+        public static void Start()
+        {
+            EngCore.Loger(1, "Graphic Thread Start");
             GrapicAttribute GA = new GrapicAttribute();
 
-            object[] Vets = GA.GetGA();
-            Vertices = Vets[0] as float[];
-
-            options.Size = new Vector2D<int>(GA.ScreenWidth, GA.ScreenHeight);
-            options.Title = Vertices[0].ToString() + "/" + Vertices[1].ToString();
-        {
-            options.Size = new Vector2D<int>(GrapicAttribute.ScreenWidth, GrapicAttribute.ScreenHeight);
-            options.Title = "Test";
             var options = WindowOptions.Default;
             options.Size = new Vector2D<int>(GrapicAttribute.ScreenWidth, GrapicAttribute.ScreenHeight);
-            
-
-
-            window.Update += OnUpdate;
-            
+            options.Title = "Texture";
+            window = Window.Create(options);
+            window.FramesPerSecond = 60;
+            window.Load += OnLoad;
+            window.Render += OnRender;
             window.Closing += OnClose;
-            window.Update += OnUpdate;
             
             window.Run();
-
             window.Dispose();
         }
 
 
         private static void OnLoad()
         {
-
             IInputContext input = window.CreateInput();
             for (int i = 0; i < input.Keyboards.Count; i++)
             {
                 input.Keyboards[i].KeyDown += KeyDown;
             }
+            
+            for (int i = 0; i < input.Keyboards.Count; i++)
+            {
+                input.Keyboards[i].KeyUp += KeyUp;
+            }
 
             Gl = GL.GetApi(window);
+            Gl.ClearColor(Color.CornflowerBlue);
 
-            Vao.VertexAttributePointer(0, 3, VertexAttribPointerType.Float, 5, 0);
-            Vao.VertexAttributePointer(1, 2, VertexAttribPointerType.Float, 5, 3);
+            Ebo = new BufferObject<uint>(Gl, Indices, BufferTargetARB.ElementArrayBuffer);
+            Vbo = new BufferObject<float>(Gl, VertexArray, BufferTargetARB.ArrayBuffer);
+            Vao = new VertexArrayObject<float, uint>(Gl, Vbo, Ebo);
 
-            Shader = new Shader(Gl, "shader.vert", "shader.frag");
             Vao.VertexAttributePointer(0, 3, VertexAttribPointerType.Float, 7, 0);
             Vao.VertexAttributePointer(1, 4, VertexAttribPointerType.Float, 7, 3);
             Shader = new Shader(Gl, "shader.vert", "shader.frag");
-            Vao.VertexAttributePointer(0, 3, VertexAttribPointerType.Float, 7, 0);
-            Vao.VertexAttributePointer(1, 4, VertexAttribPointerType.Float, 7, 3);
-            Shader = new Shader(Gl, "shader.vert", "shader.frag");
-            Gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+            EngCore.Loger(1, "Graphic Loaded");
 
-            Shader = new Shader(Gl, "shader.vert", "shader.frag");
         }
-            //Gl.Clear((uint)ClearBufferMask.ColorBufferBit);
-            //Setting a uniform.
-            //Shader.SetUniform("uBlue", (float)Math.Sin(DateTime.Now.Millisecond / 1000f * Math.PI));
 
         private static unsafe void OnRender(double obj)
-            Gl.DrawElements(PrimitiveType.Triangles, (uint)Indices.Length, DrawElementsType.UnsignedInt, null);
-            
-            //Binding and using our VAO and shader.
+        {
+            Gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+            Vao.Bind();
+            Shader.Use();
             Gl.DrawElements(PrimitiveType.Triangles, (uint)Indices.Length, DrawElementsType.UnsignedInt, null);
 
+        }
+
+        private static void OnClose()
+        {
+            //Remember to dispose all the instances.
             Vbo.Dispose();
             Ebo.Dispose();
             Vao.Dispose();
             Shader.Dispose();
+            EngCore.IsGraphicExit = true;
+        }
 
-            Gl.DrawElements(PrimitiveType.Triangles, (uint)Indices.Length, DrawElementsType.UnsignedInt, null);
 
-            Vbo.Dispose();
-            Ebo.Dispose();
-            Vao.Dispose();
-            if (arg2 == Key.Escape)
+        private static void KeyDown(IKeyboard arg1, Key arg2, int arg3)
+        {
+            if (arg2 == Key.Enter)
             {
-                window.Close();
+                bool IsTalk = true;
+            }
+            /*
+            if (IsUseMenu)
+            {
+                if (IsStartMenu)
+                {
+
+                }
+                if (IsGameMenu)
+                {
+
+                }
+                if (IsInput)
+                {
+
+                }
+            }
+            */
+            else
+            {
+                if (arg2 == Key.Escape)
+                {
+                    window.Close();
+                }
+            }
+        }
+
+        private static void KeyUp(IKeyboard arg1, Key arg2, int arg3)
+        {
+            if (arg2 == Key.Enter)
+            {
+                Console.WriteLine("Test");
             }
         }
     }
 
     class GrapicAttribute
     {
+
+
         //  unit:px 
-        public int ScreenWidth = 800;
-        public int ScreenHeight = 600;
+        static public int ScreenWidth = 800;
+        static public int ScreenHeight = 600;
 
-        float BlockWidth = 32f;
-        float BlockHeight = 32f;
+        static float BlockWidth = 64f;
+        static float BlockHeight = 64f;
 
-        public object[] GetGA()
+        public int[] GetLayPt()
         {
 
-            float StdBlockPerW = BlockWidth / ScreenWidth;
-            float StdBlockPerH = BlockHeight / ScreenHeight;
-            
-            float[] StrVertices =
-            {
-             // X                Y                 Z     R  G  B  A
-                StdBlockPerW , 0.0f , 0.0f, 1, 1, 1, 0,
-                StdBlockPerW , StdBlockPerH , 0.0f, 1, 1, 1, 0,
-                0.0f , StdBlockPerH , 0.0f, 1, 1, 1, 0,
-                0.0f , 0.0f , 0.0f, 1, 1, 1, 0
-            };
+            int StdBlockPerW = (int)Math.Ceiling(ScreenWidth / BlockWidth) + 2;
+            int StdBlockPerH = (int)Math.Ceiling(ScreenHeight / BlockHeight) + 2;
 
-            object[] GrpData = new object[] { StrVertices, StdBlockPerW, StdBlockPerH };
+            int[] GrpData = new int[] { StdBlockPerW, StdBlockPerH };
             return GrpData;
         }
 
-
-    }
-
-    class EngCore
-    {
-        private static void Main(string[] args)
+        public float[] GetBlockPt()
         {
-            string pattern = @"";
-            bool Console = false;
-            foreach (string x in args)
-            {
-                if (x == "console")
-                {
-                    Console = true;
-                }
-            }
-            if (Console == false)
-            {
-                Thread Gui = new Thread(new ThreadStart(Graphic.Start));
-                Gui.Start();                
-            }
-
-            Thread BGCore = new Thread(new ThreadStart(OnLoad));
+            float StdBlockPerW = BlockWidth / ScreenWidth;
+            float StdBlockPerH = BlockHeight / ScreenHeight;
+            return new float[] { StdBlockPerW, StdBlockPerH };
         }
 
-        private static void OnLoad()
+        public float[] GetStdVertices()
         {
-            while (true)
+            float StdBlockPerW = BlockWidth / ScreenWidth;
+            float StdBlockPerH = BlockHeight / ScreenHeight;
+            float[] StdVertices =
             {
-
-                Thread.Sleep(5);
-            }
-        }
-    }
-}            float StdBlockPerH = BlockHeight / ScreenHeight;
-            float[] StrVertices =
-{
              // X                Y                   Z     R      G      B      A
-                -1+StdBlockPerW , 1.0f             , 0.0f, 1.0f , 1.0f , 1.0f , 0.0f,
-                -1+StdBlockPerW , 1-StdBlockPerH   , 0.0f, 1.0f , 1.0f , 1.0f , 0.0f,
-                -1.0f           , 1-StdBlockPerH   , 0.0f, 1.0f , 1.0f , 1.0f , 0.0f, 
-                -1.0f           , 1.0f             , 0.0f, 1.0f , 1.0f , 1.0f , 0.0f,
+                -1+StdBlockPerW , 1.0f             , 0.0f, 1.0f , 0.0f , 0.0f , 1.0f ,
+                -1+StdBlockPerW , 1-StdBlockPerH   , 0.0f, 0.0f , 1.0f , 0.0f , 1.0f ,
+                -1.0f           , 1-StdBlockPerH   , 0.0f, 0.0f , 0.0f , 1.0f , 1.0f ,
+                -1.0f           , 1.0f             , 0.0f, 1.0f , 0.0f , 0.0f , 1.0f ,
 
             };
-            return StrVertices;
+            return StdVertices;
         }
 
 
@@ -198,6 +206,7 @@ namespace EngineTest
     {
         static public bool IsGraphicExit = false;
         static public bool IsGameStop = false;
+        static public bool IsLoaded = false;
 
         static public ArrayList LogSave = new ArrayList();
 
@@ -215,17 +224,19 @@ namespace EngineTest
             }
             if (Console == false)
             {
-                Thread Gui = new Thread(new ThreadStart(Graphic.Start));
-                Gui.Start();
-                Loger(1, "GUI Thread Start");
+                Thread GUI = new Thread(new ThreadStart(Graphic.Start));
+                GUI.Name = "Graphic";
+                GUI.Start();
+                
             }
 
             Thread BGCore = new Thread(new ThreadStart(OnLoad));
-            BGCore.Start();
-            Loger(1, "CoreEngine Thread Start");
+            BGCore.Name = "Engine";
+            //BGCore.Start();
+            
         }
 
-        private static void Loger(int State , string msg)
+        public static void Loger(int State , string msg)
         {
             
             if (State == 1)
@@ -256,292 +267,77 @@ namespace EngineTest
 
         private static void OnLoad()
         {
+            Loger(1, "CoreEngine Thread Start");
             GrapicAttribute GA = new GrapicAttribute();
-            float[] Vertices = GA.GetStdVertices();
+            int[] LayPPt = GA.GetLayPt();
+
+            float[] StdBP = GA.GetBlockPt();
             int time = 0;
-            bool right = true;
 
-            //0 Õý³£, 1 ´íÎó
+            //0 æ­£å¸¸, 1 é”™è¯¯
             int ExitCode = 1;
-            
-            while (true)
+
+            int[] tmpObj = new int[LayPPt[0] * LayPPt[1]];
+            float[] tmpVet = new float[LayPPt[0] * LayPPt[1] * 28];
+
+            for (int x = 0; x <= LayPPt[0] * LayPPt[1] - 1; x++)
             {
-                if (IsGraphicExit)
-                {
-                    break;
-                    ExitCode = 1;
-                }
-                if (IsGameStop)
-                {
-                    Thread.Sleep(20000);
-                }
-
-                time++;
-
-                if (Vertices[14] <= -1)
-                {
-                    right = true;
-                }
-                else if (Vertices[0] >= 1)
-                {
-                    right = false;
-                }
-
-                if (right)
-                {
-                    Vertices[0] += 0.001f;
-                    Vertices[7] += 0.001f;
-                    Vertices[14] += 0.001f;
-                    Vertices[21] += 0.001f;
-                    Vertices[1] -= 0.001f;
-                    Vertices[8] -= 0.001f;
-                    Vertices[15] -= 0.001f;
-                    Vertices[22] -= 0.001f;
-                }
-                else
-                {
-                    Vertices[0] -= 0.001f;
-                    Vertices[7] -= 0.001f;
-                    Vertices[14] -= 0.001f;
-                    Vertices[21] -= 0.001f;
-                    Vertices[1] += 0.001f;
-                    Vertices[8] += 0.001f;
-                    Vertices[15] += 0.001f;
-                    Vertices[22] += 0.001f;
-                }
-                if (time % 100 == 0)
-                {
-                    Loger(1 , "X:" + Vertices[0] + @"/Y:" + Vertices[1]);
-                }
-
-
-                Graphic.Vertices = Vertices;
-                Thread.Sleep(5);
+                Random r = new Random();
+                tmpObj[x] = r.Next(0, 20);
+                    
             }
-            Loger(1, "ExitCode With :" + ExitCode);
-        }
-    }
-}
+            Graphic.RenderObjects = tmpObj;
 
-/* time++;
-
-                if (Vertices[14] <= -1)
-                {
-                    right = true;
-                }
-                else if (Vertices[0] >= 1)
-                {
-                    right = false;
-                }
-
-                if (right)
-                {
-                    Vertices[0] += 0.001f;
-                    Vertices[7] += 0.001f;
-                    Vertices[14] += 0.001f;
-                    Vertices[21] += 0.001f;
-                    Vertices[1] -= 0.001f;
-                    Vertices[8] -= 0.001f;
-                    Vertices[15] -= 0.001f;
-                    Vertices[22] -= 0.001f;
-                }
-                else
-                {
-                    Vertices[0] -= 0.001f;
-                    Vertices[7] -= 0.001f;
-                    Vertices[14] -= 0.001f;
-                    Vertices[21] -= 0.001f;
-                    Vertices[1] += 0.001f;
-                    Vertices[8] += 0.001f;
-                    Vertices[15] += 0.001f;
-                    Vertices[22] += 0.001f;
-                }
-                if (time % 100 == 0)
-                {
-                    Console.WriteLine("X:" + Vertices[0] + @"/Y:" + Vertices[1]);
-                    Console.WriteLine("Load:" + Vertices);
-                }
-*/            float StdBlockPerH = BlockHeight / ScreenHeight;
-            float[] StrVertices =
-{
-             // X                Y                   Z     R      G      B      A
-                -1+StdBlockPerW , 1.0f             , 0.0f, 1.0f , 1.0f , 1.0f , 0.0f,
-                -1+StdBlockPerW , 1-StdBlockPerH   , 0.0f, 1.0f , 1.0f , 1.0f , 0.0f,
-                -1.0f           , 1-StdBlockPerH   , 0.0f, 1.0f , 1.0f , 1.0f , 0.0f, 
-                -1.0f           , 1.0f             , 0.0f, 1.0f , 1.0f , 1.0f , 0.0f,
+            float[] StdVertices =
+            {
+             // X                 Y           Z     R      G      B      A
+                -1.0f             , 1.0f + StdBP[1] , 0.0f, 1.0f , 0.0f , 0.0f , 1.0f ,
+                -1.0f             , 1.0f            , 0.0f, 0.0f , 1.0f , 0.0f , 1.0f ,
+                -1.0f - StdBP[0]  , 1.0f            , 0.0f, 0.0f , 0.0f , 1.0f , 1.0f ,
+                -1.0f - StdBP[0]  , 1.0f + StdBP[1] , 0.0f, 1.0f , 0.0f , 0.0f , 1.0f ,
 
             };
-            return StrVertices;
-        }
 
-
-    }
-
-    class EngCore
-    {
-        static public bool IsGraphicExit = false;
-        static public bool IsGameStop = false;
-
-        static public ArrayList LogSave = new ArrayList();
-
-        private static void Main(string[] args)
-        {
-            string pattern = @"";
-            bool Console = false;
-            Loger(1, "Arg:" + args);
-            foreach (string x in args)
+            for (int j = 0; j <= LayPPt[0] * LayPPt[1] - 1; j++)
             {
-                if (x == "console")
-                {
-                    Console = true;
-                }
-            }
-            if (Console == false)
-            {
-                Thread Gui = new Thread(new ThreadStart(Graphic.Start));
-                Gui.Start();
-                Loger(1, "GUI Thread Start");
-            }
+                tmpVet[0 + j * 28] += StdVertices[0] + (StdBP[0] * j);
+                tmpVet[7 + j * 28] += StdVertices[0] + (StdBP[0] * j);
+                tmpVet[14 + j * 28] += StdVertices[0] + (StdBP[0] * j);
+                tmpVet[21 + j * 28] += StdVertices[0] + (StdBP[0] * j);
 
-            Thread BGCore = new Thread(new ThreadStart(OnLoad));
-            BGCore.Start();
-            Loger(1, "CoreEngine Thread Start");
-        }
+                tmpVet[1 + j * 28] += StdVertices[1] + (StdBP[1] * j);
+                tmpVet[8 + j * 28] += StdVertices[1] + (StdBP[1] * j);
+                tmpVet[15 + j * 28] += StdVertices[1] + (StdBP[1] * j);
+                tmpVet[22 + j * 28] += StdVertices[1] + (StdBP[1] * j);       
 
-        private static void Loger(int State , string msg)
-        {
+            }
+            Graphic.VertexArray = tmpVet;
+            IsLoaded = true;
+
             
-            if (State == 1)
-            {
-                string OutLog = @"INFO " + DateTime.Now + " " + msg;
-                LogSave.Add(OutLog);
-                Console.WriteLine(OutLog);
-            }
-            else if (State == 2)
-            {
-                string OutLog = @"WARN " + DateTime.Now + " " + msg;
-                LogSave.Add(OutLog);
-                Console.WriteLine(OutLog);
-            }
-            else if (State == 3)
-            {
-                string OutLog = @"ERROR " + DateTime.Now + " " + msg;
-                LogSave.Add(OutLog);
-                Console.WriteLine(OutLog);
-            }
-            else
-            {
-                string OutLog = @"Unexcepted Info " + DateTime.Now + " " + msg;
-                LogSave.Add(OutLog);
-                Console.WriteLine(OutLog);
-            }
-        }
-
-        private static void OnLoad()
-        {
-            GrapicAttribute GA = new GrapicAttribute();
-            float[] Vertices = GA.GetStdVertices();
-            int time = 0;
-            bool right = true;
-
-            //0 Õý³£, 1 ´íÎó
-            int ExitCode = 1;
             
             while (true)
             {
+                time++;
                 if (IsGraphicExit)
                 {
+                    ExitCode = 0;
                     break;
-                    ExitCode = 1;
+                    
                 }
                 if (IsGameStop)
                 {
                     Thread.Sleep(20000);
                 }
 
-                time++;
-
-                if (Vertices[14] <= -1)
+                if (time % 20 == 0)
                 {
-                    right = true;
-                }
-                else if (Vertices[0] >= 1)
-                {
-                    right = false;
+                    Loger(1 , "> w <");
                 }
 
-                if (right)
-                {
-                    Vertices[0] += 0.001f;
-                    Vertices[7] += 0.001f;
-                    Vertices[14] += 0.001f;
-                    Vertices[21] += 0.001f;
-                    Vertices[1] -= 0.001f;
-                    Vertices[8] -= 0.001f;
-                    Vertices[15] -= 0.001f;
-                    Vertices[22] -= 0.001f;
-                }
-                else
-                {
-                    Vertices[0] -= 0.001f;
-                    Vertices[7] -= 0.001f;
-                    Vertices[14] -= 0.001f;
-                    Vertices[21] -= 0.001f;
-                    Vertices[1] += 0.001f;
-                    Vertices[8] += 0.001f;
-                    Vertices[15] += 0.001f;
-                    Vertices[22] += 0.001f;
-                }
-                if (time % 100 == 0)
-                {
-                    Loger(1 , "X:" + Vertices[0] + @"/Y:" + Vertices[1]);
-                }
-
-
-                Graphic.Vertices = Vertices;
-                Thread.Sleep(5);
+                Thread.Sleep(500);
             }
             Loger(1, "ExitCode With :" + ExitCode);
         }
     }
 }
-
-/* time++;
-
-                if (Vertices[14] <= -1)
-                {
-                    right = true;
-                }
-                else if (Vertices[0] >= 1)
-                {
-                    right = false;
-                }
-
-                if (right)
-                {
-                    Vertices[0] += 0.001f;
-                    Vertices[7] += 0.001f;
-                    Vertices[14] += 0.001f;
-                    Vertices[21] += 0.001f;
-                    Vertices[1] -= 0.001f;
-                    Vertices[8] -= 0.001f;
-                    Vertices[15] -= 0.001f;
-                    Vertices[22] -= 0.001f;
-                }
-                else
-                {
-                    Vertices[0] -= 0.001f;
-                    Vertices[7] -= 0.001f;
-                    Vertices[14] -= 0.001f;
-                    Vertices[21] -= 0.001f;
-                    Vertices[1] += 0.001f;
-                    Vertices[8] += 0.001f;
-                    Vertices[15] += 0.001f;
-                    Vertices[22] += 0.001f;
-                }
-                if (time % 100 == 0)
-                {
-                    Console.WriteLine("X:" + Vertices[0] + @"/Y:" + Vertices[1]);
-                    Console.WriteLine("Load:" + Vertices);
-                }
-*/

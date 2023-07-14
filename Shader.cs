@@ -1,8 +1,8 @@
-using System;
+﻿using System;
 using System.IO;
 using Silk.NET.OpenGL;
 
-namespace Tutorial
+namespace EngineTest
 {
     public class Shader : IDisposable
     {
