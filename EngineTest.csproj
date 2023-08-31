@@ -5,7 +5,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-	 <RootNamespace>EngineTest</RootNamespace>
+	 <RootNamespace>Cyan.Engine</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -13,13 +13,20 @@
     <PackageReference Include="Silk.NET.Input" Version="2.17.1" />
     <PackageReference Include="Silk.NET.OpenGL" Version="2.17.1" />
     <PackageReference Include="Silk.NET.Windowing" Version="2.17.1" />
+    <PackageReference Include="StbImageSharp" Version="2.27.13" />
   </ItemGroup>
 	
     <ItemGroup>
-      <None Update="Shader.frag">
+      <None Update="Solid.frag">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+	  <None Update="Textrue.frag">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="Shader.vert">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
+	   <None Update="\src">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

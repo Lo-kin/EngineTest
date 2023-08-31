@@ -1,7 +1,7 @@
 ﻿using Silk.NET.OpenGL;
 using System;
 
-namespace EngineTest
+namespace Cyan.Engine
 {
     //Our buffer object abstraction.
     public class BufferObject<TDataType> : IDisposable
@@ -13,7 +13,7 @@ namespace EngineTest
         private BufferTargetARB _bufferType;
         private GL _gl;
 
-        public unsafe BufferObject(GL gl, Span<TDataType> data, BufferTargetARB bufferType)
+        public unsafe BufferObject(GL gl, Span<TDataType> data, BufferTargetARB bufferType , int DrawType)
         {
             //Setting the gl instance and storing our buffer type.
             _gl = gl;
@@ -24,7 +24,14 @@ namespace EngineTest
             Bind();
             fixed (void* d = data)
             {
-                _gl.BufferData(bufferType, (nuint)(data.Length * sizeof(TDataType)), d, BufferUsageARB.StaticDraw);
+                if (DrawType == 0)
+                {
+                    _gl.BufferData(bufferType, (nuint)(data.Length * sizeof(TDataType)), d, BufferUsageARB.StaticDraw);
+                }
+                else if (DrawType == 1)
+                {
+                    _gl.BufferData(bufferType, (nuint)(data.Length * sizeof(TDataType)), d, BufferUsageARB.DynamicDraw);
+                }
             }
         }
 
