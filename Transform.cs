@@ -19,6 +19,6 @@ namespace Cyan.Engine
         public Quaternion Rotation { get; set; } = Quaternion.Identity;
 
         //Note: The order here does matter.
-        public Matrix4x4 ViewMatrix => Matrix4x4.Identity * Matrix4x4.CreateFromQuaternion(Rotation) * Matrix4x4.CreateTranslation(Position) * Matrix4x4.CreateScale(Scales[0], Scales[1], 1);
+        public Matrix4x4 ViewMatrix => Matrix4x4.Identity * Matrix4x4.CreateFromQuaternion(Rotation) * Matrix4x4.CreateTranslation(Position) * Matrix4x4.CreateScale(Scales[0], Scales[1], 1f);
     }
 }

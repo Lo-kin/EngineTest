@@ -26,7 +26,7 @@
       <None Update="Shader.vert">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
-	   <None Update="\src">
+	   <None Update="\src\*">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

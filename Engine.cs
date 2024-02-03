@@ -87,7 +87,7 @@ namespace Cyan.Engine
                 {
                     Loger(1, "> w <");
                 }
-
+                Console.WriteLine(Graphic.CameraPosition.Z);
                 Thread.Sleep(500);
             }
             Loger(1, "ExitCode With :" + ExitCode);
